@@ -45,6 +45,13 @@ public class CurrentWidget : MonoBehaviour
 		iConditionIcon.sprite = iconSprite;
 	}
 
+	//testing
+
+
+
+
+
+
 
 	void ApplyCountry(string countryCode)
 	{
