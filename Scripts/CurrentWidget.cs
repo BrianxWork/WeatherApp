@@ -46,7 +46,6 @@ public class CurrentWidget : MonoBehaviour
 	}
 
 
-
 	void ApplyCountry(string countryCode)
 	{
 		RegionInfo region = new RegionInfo(countryCode);
