@@ -15,12 +15,14 @@ using static System.Net.WebRequestMethods;
 public class WeatherManager : MonoBehaviour
 {
 	public static WeatherManager Instance { get; private set; }
-	private string url = "https://api.openweathermap.org/data/2.5/weather?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
-	//5dayforcast https://api.openweathermap.org/data/2.5/forecast?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric
+	private string currentUrl = "https://api.openweathermap.org/data/2.5/weather?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
+	private string forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
 	private string geoUrl = "https://ipapi.co/json/";
 	private string apiKey = "0a313a23d526c8f3aef2fb1ed72cd79c";
-	public WeatherInfo weatherInfo;
-	[SerializeField] public WeatherDisplay WeatherDisplay;
+	[SerializeField] private CurrentInfo currentInfo;
+	[SerializeField] private ForecastInfo forecastInfo;
+	[SerializeField] private IPInfo ipInfo;
+	[SerializeField] private WeatherDisplay WeatherDisplay;
 
 	private void Awake()
 	{
@@ -28,7 +30,8 @@ public class WeatherManager : MonoBehaviour
 		{
 			Destroy(this);
 		}
-		else{
+		else
+		{
 			Instance = this;
 		}
 	}
@@ -36,6 +39,7 @@ public class WeatherManager : MonoBehaviour
 	private void Start()
 	{
 		StartCoroutine(InitWeather());
+		
 	}
 
 
@@ -47,31 +51,62 @@ public class WeatherManager : MonoBehaviour
 		// Try IP-based location first
 		yield return GetLocationByIP((lat, lon, country) =>
 		{
-			url = ModifyAPIRequest(lat, lon);
+			currentUrl = ModifyAPIRequest(lat, lon);
+			forecastUrl = ModifyAPIRequest(lat, lon, true);
 			Debug.Log($"Using {country} for default location");
 		});
 
-		if (string.IsNullOrEmpty(url))
+		if (string.IsNullOrEmpty(currentUrl)|| string.IsNullOrEmpty(forecastUrl))
 		{
-			// Fallback if IP failed ¡÷ Tokyo
-			Debug.Log("IP location failed, using Tokyo as fallback");
-			url = ModifyAPIRequest(35.6895f, 139.6917f);
+			Debug.LogError("IP location failed, using Tokyo as fallback");
 		}
 
 		// Now load weather with final URL
-		yield return ShowLoadWeatherdata();
+		yield return ShowLoadWeatherdata(currentUrl);
+		yield return ShowLoadWeatherdata(forecastUrl,true);
 	}
 
-	private void Locationcallback(float lat,float lon, string country)
+	//private void Locationcallback(float lat, float lon, string country)
+	//{
+	//	currentUrl = ModifyAPIRequest(lat, lon);
+	//	Debug.Log($"Using {country} for default location");
+	//}
+
+	IEnumerator ShowLoadWeatherdata(string apirequest, bool isForcast = false)
 	{
-		url = ModifyAPIRequest(lat, lon);
-		Debug.Log($"Using {country} for default location");
+
+		UnityWebRequest weatherApi = new UnityWebRequest(apirequest);
+		weatherApi.downloadHandler = new DownloadHandlerBuffer();
+		yield return weatherApi.SendWebRequest();//wait for weatherApi to return result
+
+		if (weatherApi.result != UnityWebRequest.Result.Success)//Check if result is returned successfully
+		{
+			Debug.LogError(weatherApi.error);
+		}
+		else
+		{
+			if(!isForcast)
+			{
+				Debug.Log("JSON: " + weatherApi.downloadHandler.text);
+				string weathertext = weatherApi.downloadHandler.text;
+				currentInfo = JsonUtility.FromJson<CurrentInfo>(weathertext);
+				currentInfo.ToDisplayString();
+			}
+			else
+			{
+				Debug.Log("JSON: " + weatherApi.downloadHandler.text);
+				string weathertext = weatherApi.downloadHandler.text;
+				forecastInfo = JsonUtility.FromJson<ForecastInfo>(weathertext);
+				forecastInfo.ToDisplayString();
+			}
+				WeatherDisplay.Setup(currentInfo);
+		}
 	}
 
-	IEnumerator ShowLoadWeatherdata()
+	IEnumerator ShowLoadForcastdata()
 	{
 
-		UnityWebRequest weatherApi = new UnityWebRequest(url);
+		UnityWebRequest weatherApi = new UnityWebRequest(forecastUrl);
 		weatherApi.downloadHandler = new DownloadHandlerBuffer();
 		yield return weatherApi.SendWebRequest();//wait for weatherApi to return result
 
@@ -83,13 +118,14 @@ public class WeatherManager : MonoBehaviour
 		{
 			Debug.Log("JSON: " + weatherApi.downloadHandler.text);
 			string weathertext = weatherApi.downloadHandler.text;
-			weatherInfo = JsonUtility.FromJson<WeatherInfo>(weathertext);
-			weatherInfo.ToDisplayString();
+			currentInfo = JsonUtility.FromJson<CurrentInfo>(weathertext);
+			currentInfo.ToDisplayString();
 
-			WeatherDisplay.Setup(weatherInfo);
+			WeatherDisplay.Setup(currentInfo);
 		}
 	}
 
+	//For Default location details
 	public IEnumerator GetLocationByIP(System.Action<float, float, string> callback)
 	{
 		using (UnityWebRequest request = UnityWebRequest.Get(geoUrl))
@@ -105,18 +141,30 @@ public class WeatherManager : MonoBehaviour
 			else
 			{
 				string json = request.downloadHandler.text;
-				GeoInfo geoData = JsonUtility.FromJson<GeoInfo>(json);
+				ipInfo = JsonUtility.FromJson<IPInfo>(json);
 
-				Debug.Log($"Detected country: {geoData.country} ({geoData.latitude}, {geoData.longitude})");
-				callback?.Invoke(geoData.latitude, geoData.longitude, geoData.country_name);
+				Debug.Log($"Detected country: {ipInfo.country} ({ipInfo.latitude}, {ipInfo.longitude})");
+				callback?.Invoke(ipInfo.latitude, ipInfo.longitude, ipInfo.country_name);
 			}
 		}
 	}
 
-	public string ModifyAPIRequest(double lat, double lon, string dt = null, string date = null, string exclude = null)
+	public string ModifyAPIRequest(double lat, double lon, bool isForcast = false, string dt = null, string date = null, string exclude = null)
 	{
-		string tempURL = "https://api.openweathermap.org/data/2.5/weather?" +
-		$"lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+
+		string tempURL;
+
+		if (!isForcast)
+		{
+			tempURL = "https://api.openweathermap.org/data/2.5/weather?" +
+			$"lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+		}
+		else
+		{
+			tempURL = "https://api.openweathermap.org/data/2.5/forecast?" +
+			$"lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+		}
+
 
 		// Only add optional params if not null/empty
 		if (!string.IsNullOrEmpty(date))

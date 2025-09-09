@@ -8,7 +8,7 @@ public class WeatherDisplay : MonoBehaviour
 	[SerializeField] private CurrentWidget currentWidget;
 
 
-	public void Setup(WeatherInfo weatherinfo)
+	public void Setup(CurrentInfo weatherinfo)
     {
 		currentWidget.Setup(weatherinfo);
 	} 

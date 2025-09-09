@@ -3,7 +3,6 @@ using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class CurrentWidget : MonoBehaviour 
 {
 	//Location
@@ -20,7 +19,7 @@ public class CurrentWidget : MonoBehaviour
 	//Condition
 	[SerializeField] private TextMeshProUGUI tCondition;
 	[SerializeField] private Image iConditionIcon;
-	public void Setup(WeatherInfo weatherinfo)//pass data to text components 
+	public void Setup(CurrentInfo weatherinfo)//pass data to text components 
 	{
 		//Location
 		ApplyCountry(weatherinfo.sys.country);
@@ -32,8 +31,8 @@ public class CurrentWidget : MonoBehaviour
 		float temp = main.temp;
 		tTempeture.text = $"{temp:F1}¢XC";
 
-		tMinTemp.text = $"{main.temp_min:F0}¢X";
-		tMaxnTemp.text = $"{main.temp_max:F0}¢X";
+		tMaxnTemp.text = $"High:{main.temp_max:F0}¢X";
+		tMinTemp.text = $"Low:{main.temp_min:F0}¢X";
 		//tMaxnMinTemp.text = tempmin + "/" + tempmax;
 
 		//Condition
@@ -63,7 +62,6 @@ public class CurrentWidget : MonoBehaviour
 		// Time part (hh:mmtt -> lowercase am/pm)
 		string timePart = datetime.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLower();
 		tTime.text = timePart;
-
 	}
 
 }
