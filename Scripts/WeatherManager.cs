@@ -43,16 +43,6 @@ public class WeatherManager : MonoBehaviour
 	private void Start()
 	{
 		StartCoroutine(InitWeather());
-
-		//List<float> test = new List<float>() { 5, 3, 4, 2, 1 };
-		//test = ForecastWidget.Sort(test);
-		//string str = "";
-		//foreach (float v in test)
-		//{
-		//	str += v;
-		//	str += ", ";
-		//}
-		//Debug.Log(str);
 	}
 
 
