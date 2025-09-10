@@ -20,7 +20,7 @@ public class CurrentWidget : MonoBehaviour
 	//Condition
 	[SerializeField] private TextMeshProUGUI tCondition;
 	[SerializeField] private Image iConditionIcon;
-	public void Setup(CurrentInfo weatherinfo)//pass data to text components 
+	public void Setup(CurrentInfo weatherinfo, float highTemp, float lowTemp)//pass data to text components 
 	{
 		//Location
 		ApplyCountry(weatherinfo.sys.country);
@@ -29,11 +29,11 @@ public class CurrentWidget : MonoBehaviour
 
 		//Temp
 		Main main = weatherinfo.main;
-		float temp = main.temp;
-		tTempeture.text = $"{temp:F1}¢X";
 
-		tMaxnTemp.text = $"High: {main.temp_max:F0}¢X";
-		tMinTemp.text = $"Low: {main.temp_min:F0}¢X";
+		tTempeture.text = $"{main.temp:F1}¢X";
+
+		tMaxnTemp.text = $"High: {highTemp:F0}¢X";
+		tMinTemp.text = $"Low: {lowTemp:F0}¢X";
 
 		tFeelsLike.text = $"Feels like: {main.feels_like:F0}¢X";
 		//tMaxnMinTemp.text = tempmin + "/" + tempmax;

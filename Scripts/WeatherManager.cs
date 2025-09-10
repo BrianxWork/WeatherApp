@@ -25,6 +25,9 @@ public class WeatherManager : MonoBehaviour
 	[SerializeField] private IPInfo ipInfo;
 	[SerializeField] private WeatherDisplay WeatherDisplay;
 
+	[SerializeField] private float highTemp;
+	[SerializeField] private float lowTemp;
+
 	private void Awake()
 	{
 		if (Instance != null && Instance != this)
@@ -72,8 +75,9 @@ public class WeatherManager : MonoBehaviour
 		}
 
 		// Now load weather with final URL
-		yield return ShowLoadWeatherdata(currentUrl);
 		yield return ShowLoadWeatherdata(forecastUrl, true);
+		
+		yield return ShowLoadWeatherdata(currentUrl);
 	}
 
 	//private void Locationcallback(float lat, float lon, string country)
@@ -101,7 +105,7 @@ public class WeatherManager : MonoBehaviour
 				string weathertext = weatherApi.downloadHandler.text;
 				currentInfo = JsonUtility.FromJson<CurrentInfo>(weathertext);
 				currentInfo.ToDisplayString();
-				WeatherDisplay.CurrentSetup(currentInfo);
+				WeatherDisplay.CurrentSetup(currentInfo, highTemp, lowTemp);
 			}
 			else
 			{
@@ -110,6 +114,7 @@ public class WeatherManager : MonoBehaviour
 				forecastInfo = JsonUtility.FromJson<ForecastInfo>(weathertext);
 				forecastInfo.ToDisplayString();
 				WeatherDisplay.ForecastSetup(forecastInfo);
+				(highTemp,lowTemp)=GetHighnLowTemp(forecastInfo);
 			}
 		}
 	}
@@ -168,7 +173,7 @@ public class WeatherManager : MonoBehaviour
 		return tempURL;
 	}
 
-	public (float,float) GetHighnLowTemp(ForecastInfo weatherinfo)
+	public (float, float) GetHighnLowTemp(ForecastInfo weatherinfo)
 	{
 		List<float> temps = new List<float>();
 
