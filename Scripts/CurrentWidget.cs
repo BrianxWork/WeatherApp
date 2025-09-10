@@ -15,6 +15,7 @@ public class CurrentWidget : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI tTempeture;
 	[SerializeField] private TextMeshProUGUI tMaxnTemp;
 	[SerializeField] private TextMeshProUGUI tMinTemp;
+	[SerializeField] private TextMeshProUGUI tFeelsLike;
 
 	//Condition
 	[SerializeField] private TextMeshProUGUI tCondition;
@@ -29,15 +30,19 @@ public class CurrentWidget : MonoBehaviour
 		//Temp
 		Main main = weatherinfo.main;
 		float temp = main.temp;
-		tTempeture.text = $"{temp:F1}¢XC";
+		tTempeture.text = $"{temp:F1}¢X";
 
-		tMaxnTemp.text = $"High:{main.temp_max:F0}¢X";
-		tMinTemp.text = $"Low:{main.temp_min:F0}¢X";
+		tMaxnTemp.text = $"High: {main.temp_max:F0}¢X";
+		tMinTemp.text = $"Low: {main.temp_min:F0}¢X";
+
+		tFeelsLike.text = $"Feels like: {main.feels_like:F0}¢X";
 		//tMaxnMinTemp.text = tempmin + "/" + tempmax;
 
 		//Condition
 		Weather weather = weatherinfo.weather[0];
 		tCondition.text = weather.main;
+
+
 
 		string iconPath = $"Sprite/Weather_Icon/{weather.icon}";
 		Sprite iconSprite = Resources.Load<Sprite>(iconPath);

@@ -6,10 +6,17 @@ public class WeatherDisplay : MonoBehaviour
     //Page 
 
 	[SerializeField] private CurrentWidget currentWidget;
+	[SerializeField] private ForecastWidget forecastWidget;
 
 
-	public void Setup(CurrentInfo weatherinfo)
+	public void CurrentSetup(CurrentInfo currentInfo)
     {
-		currentWidget.Setup(weatherinfo);
+		currentWidget.Setup(currentInfo);
 	} 
+	public void ForecastSetup(ForecastInfo forecastInfo)
+    {
+		forecastWidget.Setup(forecastInfo);
+	} 
+
+
 }

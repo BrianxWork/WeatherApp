@@ -2,6 +2,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using TMPro;
 using UnityEditor.VisionOS;
@@ -39,7 +40,16 @@ public class WeatherManager : MonoBehaviour
 	private void Start()
 	{
 		StartCoroutine(InitWeather());
-		
+
+		//List<float> test = new List<float>() { 5, 3, 4, 2, 1 };
+		//test = ForecastWidget.Sort(test);
+		//string str = "";
+		//foreach (float v in test)
+		//{
+		//	str += v;
+		//	str += ", ";
+		//}
+		//Debug.Log(str);
 	}
 
 
@@ -56,14 +66,14 @@ public class WeatherManager : MonoBehaviour
 			Debug.Log($"Using {country} for default location");
 		});
 
-		if (string.IsNullOrEmpty(currentUrl)|| string.IsNullOrEmpty(forecastUrl))
+		if (string.IsNullOrEmpty(currentUrl) || string.IsNullOrEmpty(forecastUrl))
 		{
 			Debug.LogError("IP location failed, using Tokyo as fallback");
 		}
 
 		// Now load weather with final URL
 		yield return ShowLoadWeatherdata(currentUrl);
-		yield return ShowLoadWeatherdata(forecastUrl,true);
+		yield return ShowLoadWeatherdata(forecastUrl, true);
 	}
 
 	//private void Locationcallback(float lat, float lon, string country)
@@ -85,12 +95,13 @@ public class WeatherManager : MonoBehaviour
 		}
 		else
 		{
-			if(!isForcast)
+			if (!isForcast)
 			{
 				Debug.Log("JSON: " + weatherApi.downloadHandler.text);
 				string weathertext = weatherApi.downloadHandler.text;
 				currentInfo = JsonUtility.FromJson<CurrentInfo>(weathertext);
 				currentInfo.ToDisplayString();
+				WeatherDisplay.CurrentSetup(currentInfo);
 			}
 			else
 			{
@@ -98,30 +109,8 @@ public class WeatherManager : MonoBehaviour
 				string weathertext = weatherApi.downloadHandler.text;
 				forecastInfo = JsonUtility.FromJson<ForecastInfo>(weathertext);
 				forecastInfo.ToDisplayString();
+				WeatherDisplay.ForecastSetup(forecastInfo);
 			}
-				WeatherDisplay.Setup(currentInfo);
-		}
-	}
-
-	IEnumerator ShowLoadForcastdata()
-	{
-
-		UnityWebRequest weatherApi = new UnityWebRequest(forecastUrl);
-		weatherApi.downloadHandler = new DownloadHandlerBuffer();
-		yield return weatherApi.SendWebRequest();//wait for weatherApi to return result
-
-		if (weatherApi.result != UnityWebRequest.Result.Success)//Check if result is returned successfully
-		{
-			Debug.LogError(weatherApi.error);
-		}
-		else
-		{
-			Debug.Log("JSON: " + weatherApi.downloadHandler.text);
-			string weathertext = weatherApi.downloadHandler.text;
-			currentInfo = JsonUtility.FromJson<CurrentInfo>(weathertext);
-			currentInfo.ToDisplayString();
-
-			WeatherDisplay.Setup(currentInfo);
 		}
 	}
 
@@ -179,7 +168,24 @@ public class WeatherManager : MonoBehaviour
 		return tempURL;
 	}
 
+	public (float,float) GetHighnLowTemp(ForecastInfo weatherinfo)
+	{
+		List<float> temps = new List<float>();
 
+		// one forcastItem represents every 3 hours, therefore I need 8 of it to get 24hour data
+		for (int i = 0; i < 8; i++)
+		{
+			ForecastItem forcastItem = weatherinfo.list[i];
+			float temp = forcastItem.main.temp;
+
+			temps.Add(temp);
+		}
+
+		float tempmax = temps.Max();
+		float tempmin = temps.Min();
+
+		return (tempmax, tempmin);
+	}
 
 	//public IEnumerator GetCurrentLocation(Action<float,float> callback)
 	//{
