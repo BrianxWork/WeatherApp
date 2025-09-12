@@ -37,7 +37,7 @@ public class ForecastInfo
 				$"Datetime: {datetime}\n" +
 				$"  Temp: {item.main.temp}¢XC (Feels like {item.main.feels_like}¢XC)\n" +
 				$"  Min/Max: {item.main.temp_min}¢XC / {item.main.temp_max}¢XC\n" +
-				$"  Weather: {weatherMain} ({weatherDesc})\n" +
+				$"  Weather: {weatherMain} ({weatherDesc}) Icon:{item.weather[0].description}, Icon:{item.weather[0].icon}\n" +
 				$"  Clouds: {item.clouds.all}% | Wind: {item.wind.speed} m/s @ {item.wind.deg}¢X\n" +
 				$"  Humidity: {item.main.humidity}% | Pressure: {item.main.pressure} hPa\n" +
 				$"  POP: {item.pop * 100}% | Visibility: {item.visibility} m\n" +

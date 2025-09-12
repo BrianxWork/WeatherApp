@@ -30,7 +30,7 @@ public class CurrentWidget : MonoBehaviour
 		//Temp
 		Main main = weatherinfo.main;
 
-		tTempeture.text = $"{main.temp:F1}¢X";
+		tTempeture.text = $"{main.temp:F0}¢X";
 
 		tMaxnTemp.text = $"High: {highTemp:F0}¢X";
 		tMinTemp.text = $"Low: {lowTemp:F0}¢X";
