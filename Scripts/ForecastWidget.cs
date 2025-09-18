@@ -150,13 +150,14 @@ public class ForecastWidget : MonoBehaviour
 
 			if (tempdate.Date != localForecast.Date)
 			{
-				indexs.Add(i - 1);//save the previous date's index !!CHECK!!
+				//indexs.Add(i-1);//save the previous date's index !!CHECK!!
+				indexs.Add(i);//save the previous date's index !!CHECK!!
 				tempdate = localForecast.Date;
 				//Debug.Log("Add!!!!!!!!!!!!!!!");
 			}
 		}
 		Debug.Log("My DateTimeList:\n " + string.Join(", \n", datetime));
-		indexs.Add(weatherList.Length);
+		indexs.Add(weatherList.Length-1);
 		Debug.Log("My IndexList: \n" + string.Join(", ", indexs));
 		return indexs;
 	}
@@ -165,18 +166,20 @@ public class ForecastWidget : MonoBehaviour
 	{
 
 		ForecastItem[] weatherList = weatherinfo.list;
-
 		List<(float high, float low)> fivedailyhighlow = new List<(float, float)>();
+		int iStarter = 0;
 
 		for (int i = 0; i < indexList.Count; i++)
 		{
 			List<float> temps = new List<float>();
-			for (int j = 0; j < indexList[i]; j++)
+
+			for (int j = iStarter; j < indexList[i]; j++) //using <= to loop to the excact index
 			{
 				ForecastItem forcastItem = weatherinfo.list[j];
 				float temp = forcastItem.main.temp;
 
 				temps.Add(temp);
+				iStarter = indexList[i];
 			}
 			float tempmax = temps.Max();
 			float tempmin = temps.Min();

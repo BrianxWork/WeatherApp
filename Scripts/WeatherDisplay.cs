@@ -9,6 +9,12 @@ public class WeatherDisplay : MonoBehaviour
 	[SerializeField] private ForecastWidget forecastWidget;
 
 
+
+	void Start()
+	{
+		
+	}
+
 	public void CurrentSetup(CurrentInfo currentInfo, float highTemp, float lowTemp)
     {
 		currentWidget.Setup(currentInfo, highTemp, lowTemp);
@@ -17,4 +23,9 @@ public class WeatherDisplay : MonoBehaviour
     {
 		forecastWidget.Setup(forecastInfo);
 	} 
+
+	private void NewLocationUpdateDisplay(float lat, float lon)
+	{
+		
+	}
 }

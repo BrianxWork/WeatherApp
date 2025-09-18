@@ -43,10 +43,11 @@ public class WeatherManager : MonoBehaviour
 	private void Start()
 	{
 		StartCoroutine(InitWeather());
+	
 	}
 
 
-	void WeatherUpdate() => StartCoroutine(InitWeather());
+
 
 
 	private IEnumerator InitWeather()
@@ -68,7 +69,38 @@ public class WeatherManager : MonoBehaviour
 		yield return ShowLoadWeatherdata(forecastUrl, true);
 		
 		yield return ShowLoadWeatherdata(currentUrl);
+
+		SetupandDisplay(currentInfo, forecastInfo);
 	}
+
+	public void WeatherUpdate(float lat,float lon) => StartCoroutine(UpdateNewWeather(lat,lon));
+
+	public IEnumerator UpdateNewWeather(float lat, float lon)
+	{
+		yield return currentUrl = ModifyAPIRequest(lat, lon);
+		yield return forecastUrl = ModifyAPIRequest(lat, lon, true);
+
+		yield return ShowLoadWeatherdata(forecastUrl, true);
+
+		yield return ShowLoadWeatherdata(currentUrl);
+
+		SetupandDisplay(currentInfo, forecastInfo);
+	}
+
+	public void UpdateNewRequest(float lat, float lon, string country)
+	{
+		currentUrl = ModifyAPIRequest(lat, lon);
+		forecastUrl = ModifyAPIRequest(lat, lon, true);
+	}
+
+
+	void SetupandDisplay(CurrentInfo currentInfo, ForecastInfo forecastInfo)
+	{
+		(highTemp, lowTemp) = GetHighnLowTemp(forecastInfo);
+		WeatherDisplay.CurrentSetup(currentInfo, highTemp, lowTemp);
+		WeatherDisplay.ForecastSetup(forecastInfo);
+	}
+
 
 	//private void Locationcallback(float lat, float lon, string country)
 	//{
@@ -95,7 +127,8 @@ public class WeatherManager : MonoBehaviour
 				string weathertext = weatherApi.downloadHandler.text;
 				currentInfo = JsonUtility.FromJson<CurrentInfo>(weathertext);
 				currentInfo.ToDisplayString();
-				WeatherDisplay.CurrentSetup(currentInfo, highTemp, lowTemp);
+				//(highTemp, lowTemp) = GetHighnLowTemp(forecastInfo);
+				//WeatherDisplay.CurrentSetup(currentInfo, highTemp, lowTemp);
 			}
 			else
 			{
@@ -103,8 +136,8 @@ public class WeatherManager : MonoBehaviour
 				string weathertext = weatherApi.downloadHandler.text;
 				forecastInfo = JsonUtility.FromJson<ForecastInfo>(weathertext);
 				forecastInfo.ToDisplayString();
-				WeatherDisplay.ForecastSetup(forecastInfo);
-				(highTemp,lowTemp)=GetHighnLowTemp(forecastInfo);
+				//WeatherDisplay.ForecastSetup(forecastInfo);
+				
 			}
 		}
 	}
