@@ -173,6 +173,11 @@ public class ForecastWidget : MonoBehaviour
 		{
 			List<float> temps = new List<float>();
 
+			if(iStarter== indexList[indexList.Count-1])
+			{
+				break;
+			}
+
 			for (int j = iStarter; j < indexList[i]; j++) //using <= to loop to the excact index
 			{
 				ForecastItem forcastItem = weatherinfo.list[j];
