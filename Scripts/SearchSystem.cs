@@ -31,7 +31,8 @@ public class SearchSystem : MonoBehaviour
 	void Start()
 	{
 		//Load the file from Resources
-		TextAsset jsonFile = Resources.Load<TextAsset>("GeoInfo"); // omit ".json"
+		//TextAsset jsonFile = Resources.Load<TextAsset>("GeoInfo"); // omit ".json"
+		TextAsset jsonFile = Resources.Load<TextAsset>("citylist"); // omit ".json"
 
 		if (jsonFile == null)
 		{
@@ -44,8 +45,14 @@ public class SearchSystem : MonoBehaviour
 
 		allCities = JsonUtility.FromJson<Cities>(wrappedJson);
 
-		//Search("united states");//when string has changed in the text field
-		searchBtn.onClick.AddListener(()=>SetSearchWindow(true));
+		foreach (CityInfo city in allCities.cities)
+		{
+			city.ToCountryString();
+		}
+
+
+			//Search("united states");//when string has changed in the text field
+			searchBtn.onClick.AddListener(()=>SetSearchWindow(true));
 		searchBar.onValueChanged.AddListener(OnSearchValueChanged);
 	}
 
@@ -74,16 +81,17 @@ public class SearchSystem : MonoBehaviour
 		int count = 0;
 		foreach (CityInfo city in allCities.cities)
 		{
-			if (city.country.ToLower().Contains(keyword.ToLower()) || city.city.ToLower().Contains(keyword.ToLower()))
+			if (city.country.ToLower().Contains(keyword.ToLower()) || city.name.ToLower().Contains(keyword.ToLower()))
 			{
 				GameObject obj = Instantiate(cityPrefab, searchContent.transform);
 				obj.transform.SetParent(searchContent.transform, false);
 				CityBtn currentbtn = obj.GetComponent<CityBtn>();
-				currentbtn.SetCityInfo(city.city, city.country, city.lat, city.lng);
+				
+				currentbtn.SetCityInfo(city.name, city.country, city.coord.lat, city.coord.lon);
 
 				count++;
 
-				if (count > 30) // limit number of results
+				if (count > 100) // limit number of results
 					break;
 			}
 		}
@@ -105,5 +113,10 @@ public class SearchSystem : MonoBehaviour
 	public void SetSearchWindow(bool isActive)
 	{
 		searchWindow.SetActive(isActive);
+	}
+
+	public void ClearSearchBarText()
+	{
+		searchBar.text = "";
 	}
 }

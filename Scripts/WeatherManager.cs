@@ -3,14 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using TMPro;
-using UnityEditor.VisionOS;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static System.Net.WebRequestMethods;
 
 
 public class WeatherManager : MonoBehaviour
@@ -45,9 +39,6 @@ public class WeatherManager : MonoBehaviour
 		StartCoroutine(InitWeather());
 	
 	}
-
-
-
 
 
 	private IEnumerator InitWeather()

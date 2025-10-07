@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 public class Utilities
 {
@@ -19,6 +21,33 @@ public class Utilities
 		DateTime localtime = utc + offset;
 
 		return localtime;
+	}
+
+
+	//Ask Kevin
+	public static string GetCountryNameISO2(string iso2)
+	{
+		try
+		{
+			RegionInfo region = new RegionInfo(iso2.ToUpper());
+			return region.EnglishName;
+		}
+		catch
+		{
+			// fallback: try via culture
+			var culture = CultureInfo
+				.GetCultures(CultureTypes.SpecificCultures)
+				.FirstOrDefault(c =>
+				{
+					try { return new RegionInfo(c.LCID).TwoLetterISORegionName == iso2.ToUpper(); }
+					catch { return false; }
+				});
+
+			if (culture != null)
+				return new RegionInfo(culture.LCID).EnglishName;
+
+			return iso2; // still return something instead of crashing
+		}
 	}
 
 

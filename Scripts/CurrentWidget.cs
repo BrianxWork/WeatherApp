@@ -30,12 +30,12 @@ public class CurrentWidget : MonoBehaviour
 		//Temp
 		Main main = weatherinfo.main;
 
-		tTempeture.text = $"{main.temp:F0}¢X";
+		tTempeture.text = $"{Math.Floor(main.temp)}¢X";
 
-		tMaxnTemp.text = $"High: {highTemp:F0}¢X";
-		tMinTemp.text = $"Low: {lowTemp:F0}¢X";
+		tMaxnTemp.text = $"High: {Math.Floor(highTemp)}¢X";
+		tMinTemp.text = $"Low: {Math.Floor(lowTemp)}¢X";
 
-		tFeelsLike.text = $"Feels like: {main.feels_like:F0}¢X";
+		tFeelsLike.text = $"Feels like: {Math.Floor(main.feels_like)}¢X";
 		//tMaxnMinTemp.text = tempmin + "/" + tempmax;
 
 		//Condition

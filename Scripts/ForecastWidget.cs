@@ -32,7 +32,7 @@ public class ForecastWidget : MonoBehaviour
 			//Set forcast tempeture
 			ForecastItem forcastItem = weatherinfo.list[i];
 			float temp = forcastItem.main.temp;
-			infoBox.tTemp.text = $"{temp:F0}¢X";
+			infoBox.tTemp.text = $"{Math.Floor(temp)}¢X";
 
 			//Set forcast time
 			TimeSpan offset = TimeSpan.FromSeconds(weatherinfo.city.timezone);
@@ -104,6 +104,7 @@ public class ForecastWidget : MonoBehaviour
 		ForecastItem[] weatherList = weatherinfo.list;
 
 		List<string> Days = new List<string>() { "Today" };
+		//List<string> Days = new List<string>() { };
 
 		//current time
 		DateTime tempdate = DateTime.UtcNow + TimeSpan.FromSeconds(weatherinfo.city.timezone);
@@ -173,9 +174,15 @@ public class ForecastWidget : MonoBehaviour
 		{
 			List<float> temps = new List<float>();
 
+			//Break whenloop to last index of the indexList
 			if(iStarter== indexList[indexList.Count-1])
 			{
 				break;
+			}
+
+			if(indexList[0]==0)
+			{
+				//if the first value of the indexlist is 0, this means that there are no today's result
 			}
 
 			for (int j = iStarter; j < indexList[i]; j++) //using <= to loop to the excact index
@@ -222,7 +229,7 @@ public class ForecastWidget : MonoBehaviour
 
 			//HighLow Tempeture
 			(float high, float low) = highlowlist[i];
-			dailyInfoBox[i].tTempeture.text = $"{high:F0}¢X/{low:F0}¢X";
+			dailyInfoBox[i].tTempeture.text = $"{Math.Floor(high)}¢X/{Math.Floor(low)}¢X";
 		}
 	}
 

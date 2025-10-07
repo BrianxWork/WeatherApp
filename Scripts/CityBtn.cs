@@ -29,6 +29,7 @@ public class CityBtn : MonoBehaviour
 	{
 		WeatherManager.Instance.WeatherUpdate(lat, lon);
 		SearchSystem.Instance.ClearSearchResults();
+		SearchSystem.Instance.ClearSearchBarText();
 		SearchSystem.Instance.SetSearchWindow(false);
 	}
 
