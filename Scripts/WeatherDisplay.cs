@@ -15,9 +15,9 @@ public class WeatherDisplay : MonoBehaviour
 		
 	}
 
-	public void CurrentSetup(CurrentInfo currentInfo, float highTemp, float lowTemp)
+	public void CurrentSetup(CurrentInfo currentInfo, float highTemp, float lowTemp,string sCity =null,string sAdminName=null,string sCountry=null)
     {
-		currentWidget.Setup(currentInfo, highTemp, lowTemp);
+		currentWidget.Setup(currentInfo, highTemp, lowTemp, sAdminName: sAdminName);
 	} 
 	public void ForecastSetup(ForecastInfo forecastInfo)
     {

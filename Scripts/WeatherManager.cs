@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -19,8 +20,12 @@ public class WeatherManager : MonoBehaviour
 	[SerializeField] private IPInfo ipInfo;
 	[SerializeField] private WeatherDisplay WeatherDisplay;
 
-	[SerializeField] private float highTemp;
-	[SerializeField] private float lowTemp;
+	[HideInInspector] private float highTemp;
+	[HideInInspector] private float lowTemp;
+	[HideInInspector] public string city;
+	[HideInInspector] public string adminName;
+	[HideInInspector] public string country;
+
 
 	private void Awake()
 	{
@@ -44,10 +49,10 @@ public class WeatherManager : MonoBehaviour
 	private IEnumerator InitWeather()
 	{
 		// Try IP-based location first
-		yield return GetLocationByIP((lat, lon, country) =>
+		yield return GetLocationByIP((fLat, fLon, country) =>
 		{
-			currentUrl = ModifyAPIRequest(lat, lon);
-			forecastUrl = ModifyAPIRequest(lat, lon, true);
+			currentUrl = ModifyAPIRequest(lat:fLat, lon:fLon);
+			forecastUrl = ModifyAPIRequest(lat:fLat, lon: fLon, isForcast: true);
 			Debug.Log($"Using {country} for default location");
 		});
 
@@ -64,24 +69,18 @@ public class WeatherManager : MonoBehaviour
 		SetupandDisplay(currentInfo, forecastInfo);
 	}
 
-	public void WeatherUpdate(float lat,float lon) => StartCoroutine(UpdateNewWeather(lat,lon));
+	public void WeatherUpdate(string sCity,string sAdminName,string sCountry) => StartCoroutine(UpdateNewWeather(sCity, sAdminName, sCountry));
 
-	public IEnumerator UpdateNewWeather(float lat, float lon)
+	public IEnumerator UpdateNewWeather(string sCity, string sAdminName, string sCountry)
 	{
-		yield return currentUrl = ModifyAPIRequest(lat, lon);
-		yield return forecastUrl = ModifyAPIRequest(lat, lon, true);
+		yield return currentUrl = ModifyAPIRequest(sCity, sAdminName,sCountry);
+		yield return forecastUrl = ModifyAPIRequest(sCity, sAdminName, sCountry, isForcast:true);
 
 		yield return ShowLoadWeatherdata(forecastUrl, true);
 
 		yield return ShowLoadWeatherdata(currentUrl);
 
 		SetupandDisplay(currentInfo, forecastInfo);
-	}
-
-	public void UpdateNewRequest(float lat, float lon, string country)
-	{
-		currentUrl = ModifyAPIRequest(lat, lon);
-		forecastUrl = ModifyAPIRequest(lat, lon, true);
 	}
 
 
@@ -157,22 +156,44 @@ public class WeatherManager : MonoBehaviour
 		}
 	}
 
-	public string ModifyAPIRequest(double lat, double lon, bool isForcast = false, string dt = null, string date = null, string exclude = null)
+	public string ModifyAPIRequest(string sCity=null, string sAdminName = null, string sCountry = null, double? lat=null, double? lon=null, bool isForcast = false, string dt = null, string date = null, string exclude = null)
 	{
 
-		string tempURL;
+		string baseURL;
 
-		if (!isForcast)
+		if (isForcast)
 		{
-			tempURL = "https://api.openweathermap.org/data/2.5/weather?" +
-			$"lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+			baseURL = "https://api.openweathermap.org/data/2.5/forecast?";
 		}
 		else
 		{
-			tempURL = "https://api.openweathermap.org/data/2.5/forecast?" +
-			$"lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+			baseURL = "https://api.openweathermap.org/data/2.5/weather?";
 		}
 
+
+		string query = "";
+
+		if (lat.HasValue && lon.HasValue)
+		{
+			query = $"lat={lat.Value}&lon={lon.Value}";
+		}
+		else if (!string.IsNullOrEmpty(sCity))
+		{
+			query = $"q={sCity}";
+			
+			if (!string.IsNullOrEmpty(sCountry)){
+				string country=Utilities.GetCountryNameISO2(sCountry);
+				query += $",{country}";
+			}
+
+			StoreLocation(sCity, sAdminName, sCountry);
+		}
+		else
+		{
+			Debug.LogWarning("ModifyAPIRequest: Missing location data (city or coordinates).");
+		}
+
+		string tempURL = $"{baseURL}{query}&appid={apiKey}&units=metric";
 
 		// Only add optional params if not null/empty
 		if (!string.IsNullOrEmpty(date))
@@ -185,6 +206,13 @@ public class WeatherManager : MonoBehaviour
 			tempURL += $"&exclude={exclude}";
 
 		return tempURL;
+	}
+
+	public void StoreLocation(string sCity, string sAdminName, string sCountry)
+	{
+		city = sCity;
+		adminName = sAdminName;
+		country = sCountry;
 	}
 
 	public (float, float) GetHighnLowTemp(ForecastInfo weatherinfo)

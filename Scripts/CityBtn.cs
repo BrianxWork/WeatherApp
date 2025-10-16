@@ -2,13 +2,15 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class CityBtn : MonoBehaviour
 {
 	[SerializeField] private Button thisbutton;
 	[SerializeField] private TMP_Text tButtonCity;
-	[SerializeField] private float lat;
-	[SerializeField] private float lon;
+	[SerializeField] private string sCity;
+	[SerializeField] private string sAdminName;
+	[SerializeField] private string sCountry;
 
 
 	void Start()
@@ -17,17 +19,21 @@ public class CityBtn : MonoBehaviour
 		thisbutton.onClick.AddListener(UpdateLocationInfo);
 	}
 
-	public void SetCityInfo(string city, string country, float fLat, float fLon)
+	public void SetCityInfo(string city, string adminName, string country)
 	{
-		tButtonCity.text = city+", "+ country;
-		lat = fLat;
-		lon = fLon;
+		// Example output: "Kolkata, West Bengal, India"
+		tButtonCity.text = $"{city}, {adminName}, {country}";
+
+		// Store the data for later use
+		sCity = city;
+		sCountry = country;
+		sAdminName = adminName; // (optional: add this field if you want to keep it)
 	}
 
 
 	private void UpdateLocationInfo()
 	{
-		WeatherManager.Instance.WeatherUpdate(lat, lon);
+		WeatherManager.Instance.WeatherUpdate(sCity, sAdminName, sCountry);//!!
 		SearchSystem.Instance.ClearSearchResults();
 		SearchSystem.Instance.ClearSearchBarText();
 		SearchSystem.Instance.SetSearchWindow(false);

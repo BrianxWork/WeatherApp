@@ -3,11 +3,11 @@ using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class CurrentWidget : MonoBehaviour 
+public class CurrentWidget : MonoBehaviour
 {
 	//Location
 	[SerializeField] private TextMeshProUGUI tCountry;
-	[SerializeField] private TextMeshProUGUI tCity;
+	[SerializeField] private TextMeshProUGUI tStateCity;
 	[SerializeField] private TextMeshProUGUI tDate;
 	[SerializeField] private TextMeshProUGUI tTime;
 
@@ -20,11 +20,15 @@ public class CurrentWidget : MonoBehaviour
 	//Condition
 	[SerializeField] private TextMeshProUGUI tCondition;
 	[SerializeField] private Image iConditionIcon;
-	public void Setup(CurrentInfo weatherinfo, float highTemp, float lowTemp)//pass data to text components 
+	public void Setup(CurrentInfo weatherinfo, float highTemp, float lowTemp, string sCity = null, string sAdminName = null, string sCountry=null)//pass data to text components 
 	{
 		//Location
 		ApplyCountry(weatherinfo.sys.country);
-		tCity.text = weatherinfo.name;
+
+		tStateCity.text = string.IsNullOrEmpty(WeatherManager.Instance.adminName)
+		? weatherinfo.name
+		: $" {weatherinfo.name}, {WeatherManager.Instance.adminName}";
+
 		GetLocalTime(weatherinfo.timezone);
 
 		//Temp

@@ -92,8 +92,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 10
+  m_fontSizeBase: 10
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -173,7 +173,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -10.227, y: 0}
+  m_AnchoredPosition: {x: -10.22699, y: 0}
   m_SizeDelta: {x: 209.5367, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5675350947504984405
@@ -190,8 +190,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thisbutton: {fileID: 8774539963894499404}
   tButtonCity: {fileID: 7921707797052498676}
-  lat: 0
-  lon: 0
+  sCity: 
+  sAdminName: 
+  sCountry: 
 --- !u!222 &9161290943975600064
 CanvasRenderer:
   m_ObjectHideFlags: 0

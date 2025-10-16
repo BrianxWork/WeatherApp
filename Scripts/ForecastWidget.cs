@@ -51,29 +51,35 @@ public class ForecastWidget : MonoBehaviour
 
 	public List<string> GetIcon(ForecastInfo weatherinfo, List<int> indexList)
 	{
+		//looping eachday and add all the weather icon into iconList
+		//then from iconList find the icon that appears the most for that day
+		//finally add it to dailyIconList for every forcast to display
+
 		ForecastItem[] weatherList = weatherinfo.list;
 
-		Dictionary<string, int> dIcons = Utilities.GetWeatherCodeCounts();
+		List<string> dailyIconList = new List<string>();
 
-		List<string> Iconlist = new List<string>();
-
+		int iStarter = 0;
 		for (int i = 0; i < indexList.Count; i++)
 		{
-			List<string> temps = new List<string>();
-			for (int j = 0; j < indexList[i]; j++)
+			Dictionary<string, int> dIcons = Utilities.GetWeatherCodeCounts();
+			List<string> iconList = new List<string>();
+			for (int j = iStarter; j < indexList[i]; j++)
 			{
 				ForecastItem forcastItem = weatherinfo.list[j];
 				string temp = forcastItem.weather[0].icon;
 
-				temps.Add(temp);
+				iconList.Add(temp);
 			}
-			//find condition
 
-			for (int j = 0; j < temps.Count; j++)
+			//find condition
+			iStarter = indexList[i];
+
+			for (int j = 0; j < iconList.Count; j++)
 			{
-				if (dIcons.ContainsKey(temps[j]))
+				if (dIcons.ContainsKey(iconList[j]))
 				{
-					dIcons[temps[j]] += 1;
+					dIcons[iconList[j]] += 1;
 				}
 			}
 
@@ -89,14 +95,10 @@ public class ForecastWidget : MonoBehaviour
 				}
 			}
 
-			Iconlist.Add(maxKey);
+			dailyIconList.Add(maxKey);
 		}
 
-		//foreach (var pair in dIcons)
-		//{
-		//	Debug.Log($"{pair.Key}: {pair.Value}");
-		//}
-		return Iconlist;
+		return dailyIconList;
 	}
 
 	public List<string> GetDayOfWeek(ForecastInfo weatherinfo)
@@ -174,18 +176,13 @@ public class ForecastWidget : MonoBehaviour
 		{
 			List<float> temps = new List<float>();
 
-			//Break whenloop to last index of the indexList
+			//Break when loop to last index of the indexList
 			if(iStarter== indexList[indexList.Count-1])
 			{
 				break;
 			}
 
-			if(indexList[0]==0)
-			{
-				//if the first value of the indexlist is 0, this means that there are no today's result
-			}
-
-			for (int j = iStarter; j < indexList[i]; j++) //using <= to loop to the excact index
+			for (int j = iStarter; j < indexList[i]; j++) //every indexList[i] means next day in weatherinfolist
 			{
 				ForecastItem forcastItem = weatherinfo.list[j];
 				float temp = forcastItem.main.temp;
@@ -193,8 +190,16 @@ public class ForecastWidget : MonoBehaviour
 				temps.Add(temp);
 				iStarter = indexList[i];
 			}
-			float tempmax = temps.Max();
-			float tempmin = temps.Min();
+
+			float tempmax = -999;
+			float tempmin = -999;
+
+			if(temps.Count >0)
+			{
+				tempmax = temps.Max();
+				tempmin = temps.Min();
+			}
+			
 
 			fivedailyhighlow.Add((tempmax, tempmin));
 		}
@@ -216,6 +221,8 @@ public class ForecastWidget : MonoBehaviour
 
 		//FindIcon
 		List<string> icons = GetIcon(weatherinfo, indexList);
+
+		bool hastodayforecast = indexList[0] != 0;
 
 		for (int i = 0; i < dailyInfoBox.Count; i++)
 		{
