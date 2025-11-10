@@ -137,11 +137,16 @@ public class WeatherManager : MonoBehaviour
 	{
 		using (UnityWebRequest request = UnityWebRequest.Get(geoUrl))
 		{
+
+			request.SetRequestHeader("User-Agent", "Mozilla/5.0 (Unity WebRequest)");
+
 			yield return request.SendWebRequest();
 
 			if (request.result != UnityWebRequest.Result.Success)
 			{
 				Debug.LogError("Geo lookup failed: " + request.error);
+				Debug.LogError("Geo lookup failed: " + request.result);
+				Debug.LogError("Geo lookup failed: " + request.downloadHandler.text);
 				// fallback: Tokyo
 				callback?.Invoke(35.6895f, 139.6917f, "Japan");
 			}
