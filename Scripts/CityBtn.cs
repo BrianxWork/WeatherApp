@@ -22,10 +22,17 @@ public class CityBtn : MonoBehaviour
 	public void SetCityInfo(string city, string adminName, string country)
 	{
 		// Example output: "Kolkata, West Bengal, India"
-		tButtonCity.text = $"{city}, {adminName}, {country}";
+		if (city != adminName)
+		{
+			tButtonCity.text = $"{city}, {adminName}, {country}";
+		}
+		else
+		{
+			tButtonCity.text = $"{city}, {country}";
+		}
 
-		// Store the data for later use
-		sCity = city;
+			// Store the data for later use
+			sCity = city;
 		sCountry = country;
 		sAdminName = adminName; // (optional: add this field if you want to keep it)
 	}

@@ -8,6 +8,5 @@ public class ClickableImage : MonoBehaviour, IPointerClickHandler
 		SearchSystem.Instance.ClearSearchResults();
 		SearchSystem.Instance.ClearSearchBarText();
 		SearchSystem.Instance.SetSearchWindow(false);
-
 	}
 }

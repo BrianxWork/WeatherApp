@@ -167,6 +167,9 @@ public class ForecastWidget : MonoBehaviour
 
 	public List<(float, float)> FindDailyHighlow(ForecastInfo weatherinfo, List<int> indexList)
 	{
+		//the -999 is to check whether if there is todays highlow
+		//if the first index's date is the next day then
+		//there wont be any result for today, therefore it is best to hide the today's section in dailyinfobox
 
 		ForecastItem[] weatherList = weatherinfo.list;
 		List<(float high, float low)> fivedailyhighlow = new List<(float, float)>();
@@ -191,6 +194,7 @@ public class ForecastWidget : MonoBehaviour
 				iStarter = indexList[i];
 			}
 
+			
 			float tempmax = -999;
 			float tempmin = -999;
 
@@ -200,7 +204,6 @@ public class ForecastWidget : MonoBehaviour
 				tempmin = temps.Min();
 			}
 			
-
 			fivedailyhighlow.Add((tempmax, tempmin));
 		}
 
@@ -236,7 +239,17 @@ public class ForecastWidget : MonoBehaviour
 
 			//HighLow Tempeture
 			(float high, float low) = highlowlist[i];
-			dailyInfoBox[i].tTempeture.text = $"{Math.Floor(high)}¢X/{Math.Floor(low)}¢X";
+
+			//dailyInfoBox[i].tTempeture.text = $"{Math.Floor(high)}¢X/{Math.Floor(low)}¢X";
+			if (high != -999 || low != -999)
+			{
+				dailyInfoBox[i].gameObject.SetActive(true);
+				dailyInfoBox[i].tTempeture.text = $"{Math.Floor(high)}¢X/{Math.Floor(low)}¢X";
+			}
+			else
+			{
+				dailyInfoBox[i].gameObject.SetActive(false);
+			}
 		}
 	}
 

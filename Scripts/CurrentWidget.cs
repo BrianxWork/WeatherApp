@@ -10,6 +10,8 @@ public class CurrentWidget : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI tStateCity;
 	[SerializeField] private TextMeshProUGUI tDate;
 	[SerializeField] private TextMeshProUGUI tTime;
+	[SerializeField] private TextMeshProUGUI tNow;
+	[SerializeField] private TextMeshProUGUI tNextTFhours;
 
 	//Temp
 	[SerializeField] private TextMeshProUGUI tTempeture;
@@ -20,9 +22,15 @@ public class CurrentWidget : MonoBehaviour
 	//Condition
 	[SerializeField] private TextMeshProUGUI tCondition;
 	[SerializeField] private Image iConditionIcon;
+
+	private void Start()
+	{
+		//tNow.text = "Now :";
+		//tNextTFhours.text = "Next 24 hours :";
+	}
 	public void Setup(CurrentInfo weatherinfo, float highTemp, float lowTemp, string sCity = null, string sAdminName = null, string sCountry=null)//pass data to text components 
 	{
-		//Location
+		//Location !!!!!!!!!!!!!!!
 		ApplyCountry(weatherinfo.sys.country);
 
 		tStateCity.text = string.IsNullOrEmpty(WeatherManager.Instance.adminName)

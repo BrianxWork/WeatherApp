@@ -86,7 +86,7 @@ public class SearchSystem : MonoBehaviour
 
 				count++;
 
-				if (count > 100) // limit number of results
+				if (count > 200) // limit number of results
 					break;
 			}
 		}

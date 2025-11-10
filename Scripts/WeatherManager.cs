@@ -14,11 +14,13 @@ public class WeatherManager : MonoBehaviour
 	private string currentUrl = "https://api.openweathermap.org/data/2.5/weather?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
 	private string forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
 	private string geoUrl = "https://ipapi.co/json/";
-	private string apiKey = "0a313a23d526c8f3aef2fb1ed72cd79c";
+	private string apiKey;
+
 	[SerializeField] private CurrentInfo currentInfo;
 	[SerializeField] private ForecastInfo forecastInfo;
 	[SerializeField] private IPInfo ipInfo;
 	[SerializeField] private WeatherDisplay WeatherDisplay;
+	[SerializeField] private PrivateInfo privateinfo;
 
 	[HideInInspector] private float highTemp;
 	[HideInInspector] private float lowTemp;
@@ -37,12 +39,19 @@ public class WeatherManager : MonoBehaviour
 		{
 			Instance = this;
 		}
+
 	}
 
 	private void Start()
 	{
+		//getapikey
+		string sJson = "Keys/OpenWeatherAPIKey";
+		TextAsset jsonText = Resources.Load<TextAsset>(sJson);
+		privateinfo = JsonUtility.FromJson<PrivateInfo>(jsonText.text);
+		apiKey = privateinfo.apikey;
+		Debug.Log("myKEYYYYYY: "+ apiKey);
+
 		StartCoroutine(InitWeather());
-	
 	}
 
 
@@ -51,8 +60,8 @@ public class WeatherManager : MonoBehaviour
 		// Try IP-based location first
 		yield return GetLocationByIP((fLat, fLon, country) =>
 		{
-			currentUrl = ModifyAPIRequest(lat:fLat, lon:fLon);
-			forecastUrl = ModifyAPIRequest(lat:fLat, lon: fLon, isForcast: true);
+			currentUrl = ModifyAPIRequest(lat: fLat, lon: fLon);
+			forecastUrl = ModifyAPIRequest(lat: fLat, lon: fLon, isForcast: true);
 			Debug.Log($"Using {country} for default location");
 		});
 
@@ -63,18 +72,18 @@ public class WeatherManager : MonoBehaviour
 
 		// Now load weather with final URL
 		yield return ShowLoadWeatherdata(forecastUrl, true);
-		
+
 		yield return ShowLoadWeatherdata(currentUrl);
 
 		SetupandDisplay(currentInfo, forecastInfo);
 	}
 
-	public void WeatherUpdate(string sCity,string sAdminName,string sCountry) => StartCoroutine(UpdateNewWeather(sCity, sAdminName, sCountry));
+	public void WeatherUpdate(string sCity, string sAdminName, string sCountry) => StartCoroutine(UpdateNewWeather(sCity, sAdminName, sCountry));
 
 	public IEnumerator UpdateNewWeather(string sCity, string sAdminName, string sCountry)
 	{
-		yield return currentUrl = ModifyAPIRequest(sCity, sAdminName,sCountry);
-		yield return forecastUrl = ModifyAPIRequest(sCity, sAdminName, sCountry, isForcast:true);
+		yield return currentUrl = ModifyAPIRequest(sCity, sAdminName, sCountry);
+		yield return forecastUrl = ModifyAPIRequest(sCity, sAdminName, sCountry, isForcast: true);
 
 		yield return ShowLoadWeatherdata(forecastUrl, true);
 
@@ -127,7 +136,7 @@ public class WeatherManager : MonoBehaviour
 				forecastInfo = JsonUtility.FromJson<ForecastInfo>(weathertext);
 				forecastInfo.ToDisplayString();
 				//WeatherDisplay.ForecastSetup(forecastInfo);
-				
+
 			}
 		}
 	}
@@ -161,7 +170,7 @@ public class WeatherManager : MonoBehaviour
 		}
 	}
 
-	public string ModifyAPIRequest(string sCity=null, string sAdminName = null, string sCountry = null, double? lat=null, double? lon=null, bool isForcast = false, string dt = null, string date = null, string exclude = null)
+	public string ModifyAPIRequest(string sCity = null, string sAdminName = null, string sCountry = null, double? lat = null, double? lon = null, bool isForcast = false, string dt = null, string date = null, string exclude = null)
 	{
 
 		string baseURL;
@@ -185,9 +194,10 @@ public class WeatherManager : MonoBehaviour
 		else if (!string.IsNullOrEmpty(sCity))
 		{
 			query = $"q={sCity}";
-			
-			if (!string.IsNullOrEmpty(sCountry)){
-				string country=Utilities.GetCountryNameISO2(sCountry);
+
+			if (!string.IsNullOrEmpty(sCountry))
+			{
+				string country = Utilities.GetCountryNameISO2(sCountry);
 				query += $",{country}";
 			}
 
