@@ -13,7 +13,7 @@ public class WeatherManager : MonoBehaviour
 	public static WeatherManager Instance { get; private set; }
 	private string currentUrl = "https://api.openweathermap.org/data/2.5/weather?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
 	private string forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=35.6895&lon=139.6917&appid=0a313a23d526c8f3aef2fb1ed72cd79c&units=metric";
-	private string geoUrl = "https://ipapi.co/json/";
+	private string geoUrl = "https://api.ipbase.com/v1/json/";
 	private string apiKey;
 
 	[SerializeField] private CurrentInfo currentInfo;
@@ -58,10 +58,10 @@ public class WeatherManager : MonoBehaviour
 	private IEnumerator InitWeather()
 	{
 		// Try IP-based location first
-		yield return GetLocationByIP((fLat, fLon, country) =>
+		yield return GetLocationByIP((sCity, sAdminName, sCountry) =>
 		{
-			currentUrl = ModifyAPIRequest(lat: fLat, lon: fLon);
-			forecastUrl = ModifyAPIRequest(lat: fLat, lon: fLon, isForcast: true);
+			currentUrl = ModifyAPIRequest(sCity, sAdminName, sCountry);
+			forecastUrl = ModifyAPIRequest(sCity, sAdminName, sCountry, isForcast: true);
 			Debug.Log($"Using {country} for default location");
 		});
 
@@ -142,11 +142,12 @@ public class WeatherManager : MonoBehaviour
 	}
 
 	//For Default location details
-	public IEnumerator GetLocationByIP(System.Action<float, float, string> callback)
+	public IEnumerator GetLocationByIP(System.Action<string, string, string> callback)
 	{
 		using (UnityWebRequest request = UnityWebRequest.Get(geoUrl))
 		{
 
+			//request.SetRequestHeader();
 			request.SetRequestHeader("User-Agent", "Mozilla/5.0 (Unity WebRequest)");
 
 			yield return request.SendWebRequest();
@@ -157,15 +158,15 @@ public class WeatherManager : MonoBehaviour
 				Debug.LogError("Geo lookup failed: " + request.result);
 				Debug.LogError("Geo lookup failed: " + request.downloadHandler.text);
 				// fallback: Tokyo
-				callback?.Invoke(35.6895f, 139.6917f, "Japan");
+				callback?.Invoke("Taipei", "Taipei", "Taiwan");
 			}
 			else
 			{
 				string json = request.downloadHandler.text;
 				ipInfo = JsonUtility.FromJson<IPInfo>(json);
 
-				Debug.Log($"Detected country: {ipInfo.country} ({ipInfo.latitude}, {ipInfo.longitude})");
-				callback?.Invoke(ipInfo.latitude, ipInfo.longitude, ipInfo.country_name);
+				Debug.Log($"Detected country: {ipInfo.country_name} ({ipInfo.latitude}, {ipInfo.longitude})");
+				callback?.Invoke(ipInfo.city, ipInfo.city, ipInfo.country_name);
 			}
 		}
 	}

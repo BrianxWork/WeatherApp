@@ -1617,7 +1617,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.55
+  m_fontSize: 21.55
   m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4096,7 +4096,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.55
+  m_fontSize: 21.55
   m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5297,11 +5297,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3023281158736033694, guid: a1b8ca48a70255b41abc95ddf2f7d97b, type: 3}
       propertyPath: m_fontSize
-      value: 24
+      value: 19.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023281158736033694, guid: a1b8ca48a70255b41abc95ddf2f7d97b, type: 3}
+      propertyPath: m_margin.w
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3023281158736033694, guid: a1b8ca48a70255b41abc95ddf2f7d97b, type: 3}
       propertyPath: m_margin.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023281158736033694, guid: a1b8ca48a70255b41abc95ddf2f7d97b, type: 3}
+      propertyPath: m_margin.y
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3023281158736033694, guid: a1b8ca48a70255b41abc95ddf2f7d97b, type: 3}
       propertyPath: m_margin.z
